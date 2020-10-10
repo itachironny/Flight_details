@@ -24,15 +24,17 @@ app.get('/:Id',
 		//get the id and convert to integer
 		var q = parseInt(req.params['Id']);
 		//check if the id has been successfully converted
-		if(isNaN(q)){res.send("Not a valid id");res.end();} 
-		else{ next();}
+		if(isNaN(q)) res.send("Not a valid id"); 
+		else{
+			res.locals.id=q;
+			next();
+		}
 	},
 
 	function(req,res,next){
-	
 		// try to find the flight with the id
 		try{
-			fmodel.findOne({'fnum':q}).then((resp)=>{
+			fmodel.findOne({'fnum':res.locals.id}).then((resp)=>{
 				if(resp!=null){
 					res.json(resp);
 				}

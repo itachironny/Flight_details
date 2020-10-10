@@ -16,6 +16,21 @@ class TextId extends React.Component {
   }
 }
 
+class Table extends React.Component{
+  render(){
+    if(this.props.value!=null)
+    return(
+      <table>
+        <tr> <td>Flight Number</td>     <td>{this.props.value['fnum']}</td> </tr>
+        <tr> <td>Time of Flight</td>    <td>{this.props.value['dep_time']}</td> </tr>
+        <tr> <td>Origin</td>            <td>{this.props.value['origin']}</td> </tr>
+        <tr> <td>Destination</td>       <td>{this.props.value['destination']}</td> </tr>
+      </table>
+    );
+    else return(<table/>);
+  }
+}
+
 class SearchDiv extends React.Component {
   constructor(props) {
     super(props);
@@ -73,7 +88,7 @@ class SearchDiv extends React.Component {
       <div className="searchdiv">
         <TextId value={this.state.query} onChange={(event)=>{this.query_changed(event)}} />
         <SearchBtn onClick={()=>{this.search()}} />
-        <p>{this.state.result_show}</p>
+        <Table value={this.state.query_result} />
       </div>
     );
   }

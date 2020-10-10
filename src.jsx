@@ -20,14 +20,49 @@ class SearchDiv extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      query : null,
-      query_being_shown : null
+      query : "",
+      is_result : false,
+      query_result : null,
+      result_show :""
     };
   }
 
   search(){
-    this.setState({query_being_shown : this.state.query});
+    var url = 'http://localhost:3000/'+this.state.query;
+
+    fetch(url,{
+    method: 'GET', //get method of fetching
+    mode: 'no-cors'  //cross origins allowed
+    })
+    .then((response) => {
+      //validate response status
+      if (!response.ok) {
+        throw Error(response.statusText);
+      }
+      return response;
+    })
+    //convert to json
+    .then(response=> {return response.json()})
+    //read json
+    .then(
+      (result) => {
+        this.setState({
+          is_result: true,
+          query_result : result
+        });
+        console.log(result);              // -----> watching the fetched response
+      },
+      //for trapping errors
+      (error) => {
+        this.setState({
+          is_result: false,
+          query_result : null
+        });
+        console.log(error);              // -----> watching the fetching error
+      }
+    );
   }
+
   query_changed(event){
     this.setState({query:event.target.value});
   }
@@ -38,7 +73,7 @@ class SearchDiv extends React.Component {
       <div className="searchdiv">
         <TextId value={this.state.query} onChange={(event)=>{this.query_changed(event)}} />
         <SearchBtn onClick={()=>{this.search()}} />
-        <p>{this.state.query_being_shown}</p>
+        <p>{this.state.result_show}</p>
       </div>
     );
   }

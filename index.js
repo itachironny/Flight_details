@@ -1,5 +1,7 @@
-var app = require('express')();
+var express = require('express');
+var app=express();
 const mongoose = require('mongoose');
+var path = require('path');
 
 const port = process.env.PORT || 3000;
 const database_url = 'mongodb://127.0.0.1:27017/flight';
@@ -17,15 +19,21 @@ const fschema = new mongoose.Schema({
 });
 const fmodel = mongoose.model(coll_name, fschema);
 
+app.use(express.static(__dirname));
+app.use(express.json()); // for parsing application/json
+app.use(express.urlencoded({ extended: true }));  //for parsing urlencoded json body
+
 //get request to search flight by id
-app.get('/:Id',
+app.get('/:id',
 
 	function(req,res,next){
 		//get the id and convert to integer
-		var q = parseInt(req.params['Id']);
-		//check if the id has been successfully converted
-		if(isNaN(q)) res.send("Not a valid id"); 
+		var q = parseInt(req.params['id']);
+		console.log(q);
+		//check if the id has been successfully converted - 400 : Bad Request
+		if(isNaN(q)) res.sendStatus(400); 
 		else{
+			console.log("converted well");
 			res.locals.id=q;
 			next();
 		}
@@ -36,22 +44,23 @@ app.get('/:Id',
 		try{
 			fmodel.findOne({'fnum':res.locals.id}).then((resp)=>{
 				if(resp!=null){
+					// console.log(resp);
 					res.json(resp);
 				}
 				else{
-					res.send("No such flight number exists");
+					res.sendStatus(404);
 				}
 			});
 		}
 		catch(err){
-			// console.log(err);
-			res.sendStatus(404); res.end();
+			//internal server error (unexpected)
+			res.sendStatus(500);
 		}
 	}
 );
 
 app.get('/',function(req,res){
-	res.send("Just a page");
+	res.sendFile(path.join(__dirname, 'src.html'));
 });
 
 

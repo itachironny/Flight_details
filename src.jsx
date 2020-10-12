@@ -1,3 +1,4 @@
+
 function SearchBtn(props) {
   return (
     <button className="searchbtn" onClick={() => props.onClick()}>
@@ -14,6 +15,7 @@ function TextId(props){
 class FlightDetails extends React.Component {
   constructor(props){
     super(props);
+    this.socket = null;
     this.state={is_tracking : false, last_tracked_lat : "", last_tracked_long : "" };
   }
   componentDidUpdate(prevProps) {
@@ -21,60 +23,49 @@ class FlightDetails extends React.Component {
     //props.value = null enforces state.is_tracking = false
     if(this.props.value==null) {
       //the checking must be done to stop infinite loops of rerendering
-      if(this.state.is_tracking==true) this.setState({is_tracking:false, last_tracked_lat : "", last_tracked_long : "" });
+      if(this.state.is_tracking==true){
+        this.setState(
+          {is_tracking:false, last_tracked_lat : "", last_tracked_long : "" }
+        );
+        this.stop_track_by_sockets();
+      }
     }
     else{
       //break tracking only if previous flight is different
       if(prevProps.value!=null && this.props.value['fid']!== prevProps.value['fid']){
-        this.setState({is_tracking:false, last_tracked_lat : "", last_tracked_long : "" });
+        this.setState(
+          {is_tracking:false, last_tracked_lat : "", last_tracked_long : "" }
+        );
+        this.stop_track_by_sockets();
       }
     }
     
   }
-  track(){
-    if(!this.state.is_tracking) return;
-    //tracking code goes here
-            //NOTE : another tracking must be scheduled only after one tracking request is complete 
-    var url = 'http://localhost:3000/tracking/'+this.props.value['fid'];
-    console.log(url);
 
-    fetch(url,{
-    method: 'GET', //get method of fetching
-    mode: 'no-cors'  //cross origins allowed
-    })
-    .then((response) => {      
-      //validate response status
-      if (!response.ok) {
-        throw Error(response.statusText);
-      }
-      return response.json();
-    })
-    .then(
-      (result) => {
-        if(this.state.is_tracking){
-          this.setState(
-            {
+  stop_track_by_sockets(){
+    this.socket.close();
+  }
+
+  handle_socket_input(result){
+    if(this.state.is_tracking) this.setState({
               last_tracked_lat:result['lat'],
               last_tracked_long:result['long']
-            },
-            //if still tracking, schedule a tracking
-            ()=>{if(this.state.is_tracking) setTimeout(()=>{this.track()},3000)}
-          );
-          // console.log(result);              // -----> watching the fetched response
-        }
-      },
-      //for trapping errors
-      (error) => {
-        if(this.state.is_tracking) setTimeout(()=>{this.track()},3000);
-        // console.log(error);              // -----> watching the fetching error
-      }
-    );
-
+            });
+    else this.stop_track_by_sockets();
   }
+
+  start_track_by_sockets(){
+    this.socket = io('http://localhost:3080');
+    this.socket.on('connect',()=>{
+      this.socket.emit('join_request',{'fid':this.props.value['fid']}); 
+    });
+    this.socket.on('track',(data)=>this.handle_socket_input(data));
+  }
+
   toggleTracking(){
     this.setState({is_tracking:!this.state.is_tracking},
       ()=>{
-        if(this.state.is_tracking==true) this.track();
+        if(this.state.is_tracking==true) this.start_track_by_sockets();
       }
     );
   }

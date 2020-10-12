@@ -50,25 +50,35 @@ app.get('/',function(req,res){
 	res.sendFile(path.join(__dirname, 'src.html'));
 });
 
+//sockets start
+
+const io = require('socket.io')(3080, {});
+
+io.on('connection', socket => {
+	socket.on('join_request',(fid)=>{
+		// console.log('join_request');
+		socket.join("ofdafn");   //ofdafn= only flight data available for now ;)
+	});
+});
+
+//sockets end
+
 var lat=1,long=0;
 
-//get request to track by flight id
-app.get('/tracking/:id',
-	function(req,res){
-		// console.log("got req");
-		res.json({
-			'lat': lat,
-			'long':long
-		});
-	}
-);
 
 function update_lat_long(){
+	//update data
 	if(lat<1000)lat+=1; else lat=1;
 	if(long<2000) long+=2; else long=0;
+	//broadcast data
+	io.to('ofdafn').emit('track',{
+		'lat': lat,
+		'long':long
+	});
 }
 
 app.listen(port,() => {
 	console.log('flight RESTful API server started on: ' + port);
 	setInterval(update_lat_long,1000);
 });
+

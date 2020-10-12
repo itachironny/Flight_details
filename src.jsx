@@ -108,7 +108,7 @@ class FlightDetails extends React.Component {
           <tr> <td>Origin</td>            <td>{this.props.value!=null?this.props.value['origin']:""}</td> </tr>
           <tr> <td>Destination</td>       <td>{this.props.value!=null?this.props.value['destination']:""}</td> </tr>
         </table>
-        {track_btn} <br/>
+        {track_btn}
         {track_table}
       </div>
     );
@@ -163,7 +163,7 @@ class SearchDiv extends React.Component {
       //for trapping errors
       (error) => {
         this.setState({
-          error_msg: "Error occured in fetching",
+          error_msg: "No such record found",
           query_result : null
         });
         // console.log(error);              // -----> watching the fetching error
@@ -185,10 +185,8 @@ class SearchDiv extends React.Component {
         <TextId value={this.state.query} onChange={(event)=>{this.query_changed(event)}} />
         <SearchBtn onClick={()=>{this.search()}} />
         
-         <br/>
         <ErrorDiv error_msg={this.state.error_msg} onClick={()=>{this.error_cleared_by_user()}} />
 
-         <br/>
         <FlightDetails value={this.state.query_result} />
 
       </div>

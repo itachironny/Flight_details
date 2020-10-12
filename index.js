@@ -50,5 +50,25 @@ app.get('/',function(req,res){
 	res.sendFile(path.join(__dirname, 'src.html'));
 });
 
+var lat=1,long=0;
 
-app.listen(port,() => console.log('flight RESTful API server started on: ' + port));
+//get request to track by flight id
+app.get('/tracking/:id',
+	function(req,res){
+		// console.log("got req");
+		res.json({
+			'lat': lat,
+			'long':long
+		});
+	}
+);
+
+function update_lat_long(){
+	if(lat<1000)lat+=1; else lat=1;
+	if(long<2000) long+=2; else long=0;
+}
+
+app.listen(port,() => {
+	console.log('flight RESTful API server started on: ' + port);
+	setInterval(update_lat_long,1000);
+});

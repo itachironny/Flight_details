@@ -21,12 +21,12 @@ class FlightDetails extends React.Component {
     //props.value = null enforces state.is_tracking = false
     if(this.props.value==null) {
       //the checking must be done to stop infinite loops of rerendering
-      if(this.state.is_tracking==true) this.setState({is_tracking:false});
+      if(this.state.is_tracking==true) this.setState({is_tracking:false, last_tracked_lat : "", last_tracked_long : "" });
     }
     else{
-      //stop tracking only if previous flight is different
+      //break tracking only if previous flight is different
       if(prevProps.value!=null && this.props.value['fid']!== prevProps.value['fid']){
-        this.setState({is_tracking:false});
+        this.setState({is_tracking:false, last_tracked_lat : "", last_tracked_long : "" });
       }
     }
     
@@ -35,11 +35,48 @@ class FlightDetails extends React.Component {
     if(!this.state.is_tracking) return;
     //tracking code goes here
             //NOTE : another tracking must be scheduled only after one tracking request is complete 
+    var url = 'http://localhost:3000/tracking/'+this.props.value['fid'];
+    console.log(url);
+
+    fetch(url,{
+    method: 'GET', //get method of fetching
+    mode: 'no-cors'  //cross origins allowed
+    })
+    .then((response) => {      
+      //validate response status
+      if (!response.ok) {
+        throw Error(response.statusText);
+      }
+      return response.json();
+    })
+    .then(
+      (result) => {
+        if(this.state.is_tracking){
+          this.setState(
+            {
+              last_tracked_lat:result['lat'],
+              last_tracked_long:result['long']
+            },
+            //if still tracking, schedule a tracking
+            ()=>{if(this.state.is_tracking) setTimeout(()=>{this.track()},3000)}
+          );
+          // console.log(result);              // -----> watching the fetched response
+        }
+      },
+      //for trapping errors
+      (error) => {
+        if(this.state.is_tracking) setTimeout(()=>{this.track()},3000);
+        // console.log(error);              // -----> watching the fetching error
+      }
+    );
 
   }
   toggleTracking(){
-    this.setState({is_tracking:!this.state.is_tracking});
-    if(this.state.is_tracking) this.track();
+    this.setState({is_tracking:!this.state.is_tracking},
+      ()=>{
+        if(this.state.is_tracking==true) this.track();
+      }
+    );
   }
 
   render(){
@@ -130,7 +167,7 @@ class SearchDiv extends React.Component {
           error_msg: "",
           query_result : result
         });
-        console.log(result);              // -----> watching the fetched response
+        // console.log(result);              // -----> watching the fetched response
       },
       //for trapping errors
       (error) => {
@@ -138,7 +175,7 @@ class SearchDiv extends React.Component {
           error_msg: "Error occured in fetching",
           query_result : null
         });
-        console.log(error);              // -----> watching the fetching error
+        // console.log(error);              // -----> watching the fetching error
       }
     );
   }

@@ -1,34 +1,36 @@
-class SearchBtn extends React.Component {
-  render() {
-    return (
-      <button className="searchbtn" onClick={() => this.props.onClick()}>
-        Search
-      </button>
-    );
-  }
+function SearchBtn(props) {
+  return (
+    <button className="searchbtn" onClick={() => props.onClick()}>
+      Search
+    </button>
+  );
 }
 
-class TextId extends React.Component {
-  render(){
-    return (
-      <input type="text" value={this.props.value} onChange={this.props.onChange}/>
-    );
-  }
+function TextId(props){
+  return (
+    <input type="text" value={props.value} onChange={props.onChange}/>
+  );
 }
 
-class Table extends React.Component{
-  render(){
-    if(this.props.value!=null)
-    return(
-      <table>
-        <tr> <td>Flight Number</td>     <td>{this.props.value['fnum']}</td> </tr>
-        <tr> <td>Time of Flight</td>    <td>{this.props.value['dep_time']}</td> </tr>
-        <tr> <td>Origin</td>            <td>{this.props.value['origin']}</td> </tr>
-        <tr> <td>Destination</td>       <td>{this.props.value['destination']}</td> </tr>
-      </table>
-    );
-    else return(<table/>);
-  }
+function Table(props){
+  return(
+    <table>
+      <tr> <td>Flight Number</td>     <td>{props.value!=null?props.value['fid']:""}</td> </tr>
+      <tr> <td>Time of Flight</td>    <td>{props.value!=null?props.value['dep_time']:""}</td> </tr>
+      <tr> <td>Origin</td>            <td>{props.value!=null?props.value['origin']:""}</td> </tr>
+      <tr> <td>Destination</td>       <td>{props.value!=null?props.value['destination']:""}</td> </tr>
+    </table>
+  );
+}
+
+function ErrorDiv(props){
+  if(props.error_msg==="") return null;
+  return(
+    <div className="error_msg">
+      <p> {props.error_msg} </p>
+      <button onClick={() => props.onClick()}>Close</button>
+    </div>
+  );
 }
 
 class SearchDiv extends React.Component {
@@ -36,9 +38,8 @@ class SearchDiv extends React.Component {
     super(props);
     this.state = {
       query : "",
-      is_result : false,
+      error_msg : "",
       query_result : null,
-      result_show :""
     };
   }
 
@@ -62,7 +63,7 @@ class SearchDiv extends React.Component {
     .then(
       (result) => {
         this.setState({
-          is_result: true,
+          error_msg: "",
           query_result : result
         });
         console.log(result);              // -----> watching the fetched response
@@ -70,7 +71,7 @@ class SearchDiv extends React.Component {
       //for trapping errors
       (error) => {
         this.setState({
-          is_result: false,
+          error_msg: "Error occured in fetching",
           query_result : null
         });
         console.log(error);              // -----> watching the fetching error
@@ -81,6 +82,9 @@ class SearchDiv extends React.Component {
   query_changed(event){
     this.setState({query:event.target.value});
   }
+  error_cleared_by_user(){
+    this.setState({error_msg:""});
+  }
   
   render() {
 
@@ -88,6 +92,7 @@ class SearchDiv extends React.Component {
       <div className="searchdiv">
         <TextId value={this.state.query} onChange={(event)=>{this.query_changed(event)}} />
         <SearchBtn onClick={()=>{this.search()}} />
+        <ErrorDiv error_msg={this.state.error_msg} onClick={()=>{this.error_cleared_by_user()}} />
         <Table value={this.state.query_result} />
       </div>
     );

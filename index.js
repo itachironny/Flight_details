@@ -12,7 +12,7 @@ mongoose.connect(database_url, { useUnifiedTopology: true, useNewUrlParser: true
   err => {console.log('error occured'); console.log(err); }
 );
 const fschema = new mongoose.Schema({
-	fnum : Number,
+	fid : String,
 	origin : String,
 	destination: String,
 	dep_time : String
@@ -26,23 +26,10 @@ app.use(express.urlencoded({ extended: true }));  //for parsing urlencoded json 
 //get request to search flight by id
 app.get('/:id',
 
-	function(req,res,next){
-		//get the id and convert to integer
-		var q = parseInt(req.params['id']);
-		console.log(q);
-		//check if the id has been successfully converted - 400 : Bad Request
-		if(isNaN(q)) res.sendStatus(400); 
-		else{
-			console.log("converted well");
-			res.locals.id=q;
-			next();
-		}
-	},
-
-	function(req,res,next){
+	function(req,res){
 		// try to find the flight with the id
 		try{
-			fmodel.findOne({'fnum':res.locals.id}).then((resp)=>{
+			fmodel.findOne({'fid':req.params['id']}).then((resp)=>{
 				if(resp!=null){
 					// console.log(resp);
 					res.json(resp);

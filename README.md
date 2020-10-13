@@ -3,8 +3,8 @@ A website that shows the flight available details
 
 # What it does
 It shows a webpage with a searchbar and search button, which maybe used to query flight details.
-On query success, fight details is displayed along with a button to toggle tracking of the flight. If unsuccessful, message is shown.
-When tracking is enabled,tracked latitude and longitude of flight is shown.
+On query success, fight details is displayed along with a button to toggle tracking of the flight. If unsuccessful, error message is shown.
+While tracking is enabled, tracked latitude and longitude of flight is shown.
 
 # Requirements
 1. Linux

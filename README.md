@@ -13,9 +13,9 @@ When tracking is enabled,tracked latitude and longitude of flight is shown.
 
 # How to use it
 1. Clone the repo
-2. Run 'npm install --save' to install all dependencies mentioned in package.json
-3. Run 'npm run build' to build the client-side javascript
-4. Run 'nodemon index.js' to launch the app
+2. Run `npm install --save` to install all dependencies mentioned in package.json
+3. Run `npm run build` to build the client-side javascript
+4. Run `npm start` to launch the app
 
 # Additional info
 1. The app will run on the port 3000
@@ -24,7 +24,7 @@ When tracking is enabled,tracked latitude and longitude of flight is shown.
 4. The API to fetch flight details may be queried at route '/:flight_id' (replace ':flight_id' by the actual flight id to be queried) with a get request.
 
 # Database requirements
-*database must be set up externally
+*database must be set up externally*
 1. The app uses mongodb.
 2. It expects a mongobd server running at 'mongodb://127.0.0.1:27017'
 3. The cluster name should be 'flight'
@@ -38,5 +38,7 @@ When tracking is enabled,tracked latitude and longitude of flight is shown.
 5. This is the same schema of the response of the API.
 
 Right now, the tracking is purely representational. It does not fetch data from sources external to the server.
+
+***
 
 Is it a bird? Is it a superman? No thats a plane, thank you.

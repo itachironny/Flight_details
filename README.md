@@ -21,17 +21,20 @@ When tracking is enabled,tracked latitude and longitude of flight is shown.
 1. The app will run on the port 3000
 2. A socket server will run on port 3080
 3. The website is present at '/' route.
-4. The API to fetch flight details may be queried at route '/:flight_id' (replace 'flight_id' by the actual flight id to be queried) with a get request.
+4. The API to fetch flight details may be queried at route '/:flight_id' (replace ':flight_id' by the actual flight id to be queried) with a get request.
 
 # Database requirements
+*database must be set up externally
 1. The app uses mongodb.
 2. It expects a mongobd server running at 'mongodb://127.0.0.1:27017'
 3. The cluster name should be 'flight'
 4. There should be a collection of name 'all_flights' having the following schema :
+```
           fid : String,
           origin : String,
           destination : String,
           dep_time : String
+```
 5. This is the same schema of the response of the API.
 
 Right now, the tracking is purely representational. It does not fetch data from sources external to the server.

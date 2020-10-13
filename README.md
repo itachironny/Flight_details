@@ -7,8 +7,9 @@ On query success, fight details is displayed along with a button to toggle track
 When tracking is enabled,tracked latitude and longitude of flight is shown.
 
 # Requirements
-Linux
-npm
+1. Linux
+2. npm
+3. Internet connection to install npm dependencies
 
 # How to use it
 1. Clone the repo
